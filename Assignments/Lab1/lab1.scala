@@ -123,11 +123,19 @@ ohHousing.show(5)
 // TODO: Replace <FILL IN> with appropriate code
 
 import org.apache.spark.ml.{Pipeline, PipelineModel, PipelineStage}
+import scala.collection.mutable
 
-val numPipeline = Pipeline.setStages(Array(imputer, va, scaler))
-val catPipeline = Pipeline.setStages(Array(indexer, encoder))
-val numPipeline = PipelineStage.setStages(Array(imputer, va, scaler))
+var numStage = new mutable.ArrayBuffer[PipelineStage]()
+numStage += imputer
+numStage += va
+numStage += scaler
 
+var catStage = new mutable.ArrayBuffer[PipelineStage]()
+catStage += indexer
+catStage += encoder
+
+val numPipeline = new Pipeline().setStages(numStage.toArray)
+val catPipeline = new Pipeline().setStages(catStage.toArray)
 
 val pipeline = new Pipeline().setStages(Array(numPipeline, catPipeline))
 val newHousing = pipeline.fit(renamedHousing).transform(renamedHousing)
