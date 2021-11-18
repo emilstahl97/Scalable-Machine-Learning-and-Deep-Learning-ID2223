@@ -322,3 +322,35 @@ val evaluator = new RegressionEvaluator().setPredictionCol("prediction").setLabe
 val rmse = evaluator.evaluate(predictions)
 println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
 
+
+// COMMAND ----------
+
+/*
+6. Hyperparameter tuning
+*/
+
+import org.apache.spark.ml.tuning.ParamGridBuilder
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+import org.apache.spark.ml.tuning.CrossValidator
+
+val paramGrid = new ParamGridBuilder().addGrid(rf.numTrees, Array(1, 5, 10)).addGrid(rf.maxDepth, Array(5 ,10, 15)).build()
+
+val evaluator = new RegressionEvaluator().setLabelCol("label").setPredictionCol("prediction")//.setMetricName(<FILL IN>)
+
+val cv = new CrossValidator()
+    .setEstimator(rf)
+    .setEvaluator(evaluator)
+    .setEstimatorParamMaps(paramGrid)
+    .setNumFolds(3)
+
+val cvModel = cv.fit(trainSet)
+
+val predictions = cvModel.transform(testSet)
+predictions.select("prediction", "label", "features").show(5)
+
+val rmse = evaluator.evaluate(predictions)
+println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
+
+// COMMAND ----------
+
+
