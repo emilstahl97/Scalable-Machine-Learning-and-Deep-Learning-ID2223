@@ -230,5 +230,95 @@ val lr = new LinearRegression()
 val lrModel = lr.fit(trainSet)
 val trainingSummary = lrModel.summary
 
-println(s"Coefficients: $lrModel.coefficients. Intercept: <FILL IN>")
-println(s"RMSE: <FILL IN>")
+// someone fix printout 
+println(s"Coefficients: $lrModel.coefficients. Intercept: $lrModel.intercept")
+println(s"RMSE: $trainingSummary.rootMeanSquaredError")
+
+// COMMAND ----------
+
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+
+// make predictions on the test data
+val predictions = lrModel.transform(testSet)
+predictions.select("prediction", "label", "features").show(5)
+
+// select (prediction, true label) and compute test error.
+val evaluator = new RegressionEvaluator().setPredictionCol("prediction").setLabelCol("label")
+val rmse = evaluator.evaluate(predictions)
+println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
+
+// COMMAND ----------
+
+/*
+5.2. Decision tree regression
+
+Repeat what you have done on Regression Model to build a Decision Tree model. Use the DecisionTreeRegressor to make a model and then measure its RMSE on the test dataset.
+*/
+
+import org.apache.spark.ml.regression.DecisionTreeRegressor
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+
+val dt = new DecisionTreeRegressor()
+
+// train the model
+val dtModel = dt.fit(trainSet)
+
+// make predictions on the test data
+val predictions = dtModel.transform(testSet)
+predictions.select("prediction", "label", "features").show(5)
+
+// select (prediction, true label) and compute test error
+val evaluator = new RegressionEvaluator().setPredictionCol("prediction").setLabelCol("label")
+val rmse = evaluator.evaluate(predictions)
+println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
+
+// COMMAND ----------
+
+/*
+5.3. Random forest regression
+
+Let's try the test error on a Random Forest Model. You can use the RandomForestRegressor to make a Random Forest model.
+*/
+
+import org.apache.spark.ml.regression.RandomForestRegressor
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+
+val rf = new RandomForestRegressor()
+
+// train the model
+val rfModel = rf.fit(trainSet)
+
+// make predictions on the test data
+val predictions = rfModel.transform(testSet)
+predictions.select("prediction", "label", "features").show(5)
+
+// select (prediction, true label) and compute test error
+val evaluator = new RegressionEvaluator().setPredictionCol("prediction").setLabelCol("label")
+val rmse = evaluator.evaluate(predictions)
+println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
+
+// COMMAND ----------
+
+/*
+5.4. Gradient-boosted tree regression
+
+Finally, we want to build a Gradient-boosted Tree Regression model and test the RMSE of the test data. Use the GBTRegressor to build the model.
+*/
+
+import org.apache.spark.ml.regression.GBTRegressor
+import org.apache.spark.ml.evaluation.RegressionEvaluator
+
+val gb = new GBTRegressor()
+
+// train the model
+val gbModel = gb.fit(trainSet)
+
+// make predictions on the test data
+val predictions = gbModel.transform(testSet)
+predictions.select("prediction", "label", "features").show(5)
+
+// select (prediction, true label) and compute test error
+val evaluator = new RegressionEvaluator().setPredictionCol("prediction").setLabelCol("label")
+val rmse = evaluator.evaluate(predictions)
+println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
+
