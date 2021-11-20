@@ -353,4 +353,93 @@ println(s"Root Mean Squared Error (RMSE) on test data = $rmse")
 
 // COMMAND ----------
 
+/*
+7.1. Load the data
+*/
+
+val credit = spark.read.options(Map("inferSchema"->"true","delimiter"->",","header"->"true"))
+  .csv("dbfs:/FileStore/shared_uploads/emilstah@kth.se/ccdefault.csv")
+
+credit.show(5)
+
+// COMMAND ----------
+
+/*
+7.2. Carry out some exploratory analyses (e.g., how various features and the target variable are distributed)
+*/
+
+//print number of records and columns in the dataset
+println(s"$credit.count()")
+println(s"$credit.columns()")
+
+credit.printSchema()
+
+// COMMAND ----------
+
+//print a summary of statistics for the attribute 'DEFAULT'
+credit.select(col("DEFAULT")).describe().show()
+
+// COMMAND ----------
+
+//print label count
+credit.groupBy(col("DEFAULT")).count().show()
+print(s"Total number of records in the dataset = $credit.count()")
+
+// COMMAND ----------
+
+/*
+Prepare the dataset for Machine Learning algorithms
+*/
+
+// rename the label column from 'DEFAULT' to 'label' and remove the "ID" column
+
+val credit_dataset = credit.withColumnRenamed("DEFAULT", "label").drop("ID")
+
+credit_dataset.show(5)
+
+// COMMAND ----------
+
+// label columns
+val colLabel = "label"
+
+// categorical columns
+val colCat_1 = "SEX"
+val colCat_2 = "EDUCATION"
+val colCat_3 = "MARRIAGE"
+
+import scala.collection.mutable.ArrayBuffer
+
+var colNum = ArrayBuffer[String]()
+
+for (column <- credit_dataset.columns) {
+  if(column != colLabel && 
+             column != colCat_1 &&
+             column != colCat_2 &&
+             column != colCat_3)
+  print(s"$column , ")
+  colNum += column
+}
+//println(columns)
+
+// COMMAND ----------
+
+//    print('Column {0} has {1} null values'.format(c, credit_dataset.filter(col(c).isNull()).count()))
+
+import org.apache.spark.ml.feature.OneHotEncoder
+
+val ohEncoder = new OneHotEncoder().setInputCols(Array(colCat_1, colCat_2, colCat_3)).setOutputCols(Array("SEX_vectors","EDUCATION_vectors","MARRIAGE_vectors"))
+
+val ohCredit = ohEncoder.fit(credit_dataset).transform(credit_dataset)
+
+ohCredit.show(5)
+
+// COMMAND ----------
+
+import org.apache.spark.ml.feature.VectorAssembler
+
+val va3 = new VectorAssembler().setInputCols(colNum).setOutputCol("vector_features")
+
+val featuredCredit = va3.transform(ohCredit)
+
+featuredCredit.show(5)
 
