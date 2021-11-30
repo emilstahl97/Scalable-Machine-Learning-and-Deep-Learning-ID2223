@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
+Assignments/Lab1/.metals/metals.h2.db
+Assignments/Lab1/.vscode/settings.json
