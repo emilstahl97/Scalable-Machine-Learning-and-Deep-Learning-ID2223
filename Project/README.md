@@ -6,8 +6,10 @@ In this work, we train six different machine learning models to recognize differ
 ## 2. Dataset
 The RAVDESS dataset includes around 1,500 audio files from 24 different actors. 12 male and 12 female actors record short audio clips reflecting 8 different emotions where each integer of the audio file corresponds to an emotion.
 
-* 1 = neutral • 2=calm
-* 3 = happy • 4 = sad
+* 1 = neutral 
+* 2=calm
+* 3 = happy 
+* 4 = sad
 * 5 = angry
 * 6 = fearful
 * 7 = disgust
